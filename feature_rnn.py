@@ -1305,6 +1305,82 @@ def test_word_features(n_epochs=250, optimizer='cg', max_lines=1000):
 
     plt.show()
 
+def to_feature_output( line, probabilities ):
+    split_line = line.split(" ")
+    out_list = [ split_line[0] ]
+    for i, p in enumerate( probabilities ):
+      if i > 0:
+        continue
+      out_list.append( "%i_%.2f" % ( i, p ) )
+    out_list.append( split_line[-1] )
+    return " ".join( out_list )
+
+def generate_word_features(n_epochs=250, optimizer='cg', max_lines=1000):
+    """ Test RNN with feature (softmax) outputs. """
+    n_hidden = 10
+    n_in = 32 #5
+    n_steps = 10
+    n_seq = 10  # per batch
+    n_batches = 50
+    n_classes = 3
+    n_out = n_classes  # restricted to single softmax per time step
+    n_test = 50 # the number of words to test
+
+    ref_file = '/home/bjkomer/CS886/Project/list_schunk.txt'
+    ref_in = open( ref_file, 'r' )
+    ref_lines = ref_in.readlines()
+    # Convert the text wo a word vector dictionary for easy access
+    ( word_dict, vector_dict, n_in ) = to_word_vector_dict( ref_lines )
+    ref_in.close()
+    
+    label_file = '/home/bjkomer/CS886/Project/label_schunk.txt'
+    label_in = open( label_file, 'r' )
+    label_lines = label_in.readlines()
+    # Convert the text wo a word vector dictionary for easy access
+    ( label_dict, label_vector_dict, n_out ) = to_label_dict( label_lines )
+    label_in.close()
+
+    data_file = '/home/bjkomer/CS886/Project/clean_schunk.txt'
+    data_in = open( data_file, 'r' )
+    data_lines = data_in.readlines()
+    data_lines = data_lines[:max_lines]
+    # Build seq and target arrays
+    ( seq, targets ) = build_seq_targets( word_dict, label_dict, data_lines,
+                                          n_in, n_out )
+    data_in.close()
+
+    model = MetaRNN(n_in=n_in, n_hidden=n_hidden, n_out=n_out,
+                    learning_rate=0.005, learning_rate_decay=0.999,
+                    n_epochs=n_epochs, batch_size=n_seq, activation='tanh',
+                    output_type='softmax')
+
+    model.fit(seq, targets, validate_every=10, compute_zero_one=True,
+              optimizer=optimizer)
+
+    guess = model.predict_proba(seq[:, 0][:, np.newaxis])
+    
+    out_file = open( 'schunk_output_' + str(max_lines) + '.txt', 'w' )
+    # Mallet seems to need newlines in specific places to work properly
+    dirty_file = open( '/home/bjkomer/CS886/Project/schunk.txt', 'r' )
+    dirty_lines = dirty_file.readlines()
+  
+    cur_line = 0
+    for d in dirty_lines:
+      if len(d.strip()) == 0:
+        out_file.write( d )
+      else:
+        out_file.write( to_feature_output( data_lines[cur_line], guess[cur_line,0,:] ) )
+        cur_line += 1
+      if cur_line == max_lines:
+        break
+
+
+    #for i in xrange( max_lines ):
+    #  out_file.write( to_feature_output( data_lines[i], guess[i,0,:] ) )
+
+    dirty_file.close()
+    out_file.close()
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     t0 = time.time()
@@ -1312,6 +1388,7 @@ if __name__ == "__main__":
     #test_binary(optimizer='sgd', n_epochs=1000)
     #test_softmax(n_epochs=250, optimizer='sgd')
     #test_condensed_vector(n_epochs=250, optimizer='sgd')
-    test_word_features(n_epochs=350, optimizer='sgd', max_lines=90000)
+    #test_word_features(n_epochs=400, optimizer='sgd', max_lines=2000)
+    generate_word_features(n_epochs=250, optimizer='sgd', max_lines=8400)
     #test_word_features(n_epochs=250, optimizer='sgd', max_lines=1000)
     print "Elapsed time: %f" % (time.time() - t0)
