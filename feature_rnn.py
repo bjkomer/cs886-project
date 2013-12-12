@@ -1309,8 +1309,8 @@ def to_feature_output( line, probabilities ):
     split_line = line.split(" ")
     out_list = [ split_line[0] ]
     for i, p in enumerate( probabilities ):
-      if i > 0:
-        continue
+      #if i > 0:
+      #  continue
       out_list.append( "%i_%.2f" % ( i, p ) )
     out_list.append( split_line[-1] )
     return " ".join( out_list )
@@ -1326,21 +1326,21 @@ def generate_word_features(n_epochs=250, optimizer='cg', max_lines=1000):
     n_out = n_classes  # restricted to single softmax per time step
     n_test = 50 # the number of words to test
 
-    ref_file = '/home/bjkomer/CS886/Project/list_schunk.txt'
+    ref_file = '/home/bjkomer/CS886/Project/list_ner.txt'
     ref_in = open( ref_file, 'r' )
     ref_lines = ref_in.readlines()
     # Convert the text wo a word vector dictionary for easy access
     ( word_dict, vector_dict, n_in ) = to_word_vector_dict( ref_lines )
     ref_in.close()
     
-    label_file = '/home/bjkomer/CS886/Project/label_schunk.txt'
+    label_file = '/home/bjkomer/CS886/Project/label_ner.txt'
     label_in = open( label_file, 'r' )
     label_lines = label_in.readlines()
     # Convert the text wo a word vector dictionary for easy access
     ( label_dict, label_vector_dict, n_out ) = to_label_dict( label_lines )
     label_in.close()
 
-    data_file = '/home/bjkomer/CS886/Project/clean_schunk.txt'
+    data_file = '/home/bjkomer/CS886/Project/clean_ner.txt'
     data_in = open( data_file, 'r' )
     data_lines = data_in.readlines()
     data_lines = data_lines[:max_lines]
@@ -1359,9 +1359,9 @@ def generate_word_features(n_epochs=250, optimizer='cg', max_lines=1000):
 
     guess = model.predict_proba(seq[:, 0][:, np.newaxis])
     
-    out_file = open( 'schunk_output_' + str(max_lines) + '.txt', 'w' )
+    out_file = open( 'ner_output_' + str(max_lines) + '.txt', 'w' )
     # Mallet seems to need newlines in specific places to work properly
-    dirty_file = open( '/home/bjkomer/CS886/Project/schunk.txt', 'r' )
+    dirty_file = open( '/home/bjkomer/CS886/Project/ner.txt', 'r' )
     dirty_lines = dirty_file.readlines()
   
     cur_line = 0
@@ -1389,6 +1389,6 @@ if __name__ == "__main__":
     #test_softmax(n_epochs=250, optimizer='sgd')
     #test_condensed_vector(n_epochs=250, optimizer='sgd')
     #test_word_features(n_epochs=400, optimizer='sgd', max_lines=2000)
-    generate_word_features(n_epochs=250, optimizer='sgd', max_lines=8400)
+    generate_word_features(n_epochs=350, optimizer='sgd', max_lines=200000)
     #test_word_features(n_epochs=250, optimizer='sgd', max_lines=1000)
     print "Elapsed time: %f" % (time.time() - t0)
