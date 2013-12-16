@@ -1311,13 +1311,13 @@ def to_feature_output( line, probabilities ):
     for i, p in enumerate( probabilities ):
       #if i > 0:
       #  continue
-      out_list.append( "%i_%.2f" % ( i, p ) )
+      out_list.append( "%i_%.4f" % ( i, p ) )
     out_list.append( split_line[-1] )
     return " ".join( out_list )
 
 def generate_word_features(n_epochs=250, optimizer='cg', max_lines=1000):
     """ Test RNN with feature (softmax) outputs. """
-    n_hidden = 10
+    n_hidden = 100
     n_in = 32 #5
     n_steps = 10
     n_seq = 10  # per batch
@@ -1359,7 +1359,7 @@ def generate_word_features(n_epochs=250, optimizer='cg', max_lines=1000):
 
     guess = model.predict_proba(seq[:, 0][:, np.newaxis])
     
-    out_file = open( 'ner_output_' + str(max_lines) + '.txt', 'w' )
+    out_file = open( 'ner_h100_4d_output_' + str(max_lines) + '.txt', 'w' )
     # Mallet seems to need newlines in specific places to work properly
     dirty_file = open( '/home/bjkomer/CS886/Project/ner.txt', 'r' )
     dirty_lines = dirty_file.readlines()

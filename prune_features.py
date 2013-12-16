@@ -7,7 +7,7 @@ def main( file_name='schunk_output_200000.txt',
           removal= '11111111111',
           condense='00000000000' ):
   f_in = open( file_name, 'r' )
-  f_out = open( "pruned_" + file_name, 'w' )
+  f_out = open( "pruned_" + removal + "_" + condense + "_" + file_name, 'w' )
 
   lines = f_in.readlines()
   for line in lines:
