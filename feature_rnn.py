@@ -957,14 +957,6 @@ def test_features(n_epochs=250, optimizer='cg'):
         val_in = random.getrandbits(5) # between 0 and 31
         seq[i,j,val_in] = 1
         # Set up targets
-        """
-        if val_in < 10:
-          targets[i,j] = 0
-        elif val_in < 20:
-          targets[i,j] = 1
-        else:
-          targets[i,j] = 2
-        """
         # Try a more complicated relationship
         if val_in < 3:
           targets[i,j] = 0
@@ -1009,14 +1001,6 @@ def test_features(n_epochs=250, optimizer='cg'):
         val_in = random.getrandbits(5) # between 0 and 31
         sequence[i,j,val_in] = 1
         # Set up targets
-        """
-        if val_in < 10:
-          target[i,j] = 0
-        elif val_in < 20:
-          target[i,j] = 1
-        else:
-          target[i,j] = 2
-        """
         # Try a more complicated relationship
         if val_in < 3:
           target[i,j] = 0
@@ -1373,10 +1357,6 @@ def generate_word_features(n_epochs=250, optimizer='cg', max_lines=1000):
         cur_line += 1
       if cur_line == max_lines:
         break
-
-
-    #for i in xrange( max_lines ):
-    #  out_file.write( to_feature_output( data_lines[i], guess[i,0,:] ) )
 
     dirty_file.close()
     out_file.close()
